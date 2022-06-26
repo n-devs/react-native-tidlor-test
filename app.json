@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "tidlor test",
+    "slug": "tidlor test",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/favicon-3.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/img-logo-tidlor.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#dee2e6"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/img-logo-tidlor.png",
+        "backgroundColor": "#dee2e6"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon-3.png"
+    }
+  }
+}

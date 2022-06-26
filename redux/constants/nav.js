@@ -1,0 +1,1 @@
+export const UPDATE_ฺNAVIGATION = 'UPDATE_ฺNAVIGATION';
