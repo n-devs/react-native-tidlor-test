@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "tidlor test",
-    "slug": "tidlor test",
+    "slug": "tidlor_test",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/favicon-3.png",
@@ -22,12 +22,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/img-logo-tidlor.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#dee2e6"
       }
     },
     "web": {
       "favicon": "./assets/favicon-3.png"
-    }
+    },
+    "description": "test app",
+    "githubUrl": "https://github.com/n-devs/react-native-tidlor-test.git"
   }
 }
