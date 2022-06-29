@@ -1,5 +1,5 @@
 import { put, call, takeEvery } from 'redux-saga/effects'
-import { api } from '../services'
+import { api } from '../services/mock'
 import {
       SET_LOADING,
       GET_USERS,
@@ -14,7 +14,9 @@ import {
 
 export function* getUsersRedux() {
       yield put({ type: SET_LOADING })
+      console.log(api.getUsers);
       const users = yield call(api.getUsers)
+      console.log(users);
       yield put({ type: GET_USERS, payload: users })
 }
 

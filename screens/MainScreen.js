@@ -75,7 +75,7 @@ function MainScreen(props) {
                   data={deleteDataState}
                   open={modalVisible}
                   onDelete={() => {
-                        let removeData = usersRedux.users.filter(user => user.id !== deleteDataState.id);
+                        // let removeData = usersRedux.users.filter(user => user.id !== deleteDataState.id);
 
 
                         setModalVisible(!modalVisible)
