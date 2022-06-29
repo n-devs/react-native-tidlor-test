@@ -1,4 +1,4 @@
- const _users = [{
+ var _users = [{
       "id": 0,
       "firstName": "ณัฐภัทร",
       "lastName": "เพียสังกะ",

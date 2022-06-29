@@ -21,18 +21,18 @@ export const api = {
 
       createUsers: async (data) => {
             try {
-                  _users = data
+                  // _users = data
 
-                  return _users
+                  return data
             } catch (err) {
                   return console.error(err)
             }
       },
       updateUsers: async (data) => {
             try {
-                  _users = data
+                  // _users = data
 
-                  return _users
+                  return data
             } catch (err) {
                   return console.error(err)
             }
