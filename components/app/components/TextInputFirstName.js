@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
+import PropTypes from 'prop-types';
 
 function ChackValue(props) {
 
@@ -13,20 +14,34 @@ function ChackValue(props) {
 
 }
 
+ChackValue.propTypes = {
+      value: PropTypes.string
+}
+
 export default function TextInputFirstName(props) {
-      const { value, onChangeText } = props;
+      const { value, onChangeText, onBlur,error } = props;
       return (
             <View style={styles.container}>
                   <Text>ชื่อ</Text>
                   <TextInput
                         style={styles.input}
-                        onChangeText={text => onChangeText(text)}
+                        onChangeText={onChangeText}
+                        onBlur={onBlur}
                         value={value}
+                        name={props.name} 
+                        ref={props.ref} 
                   ></TextInput>
-                  <ChackValue value={value}></ChackValue>
+                  <ChackValue value={value} error={error}></ChackValue>
             </View>
       )
 };
+
+TextInputFirstName.propTypes = {
+      value: PropTypes.string,
+      onChangeText: PropTypes.func,
+      onBlur: PropTypes.func
+
+}
 
 const styles = StyleSheet.create({
       container: {

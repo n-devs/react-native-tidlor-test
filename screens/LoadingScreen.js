@@ -1,16 +1,23 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
-import GetStartedButton from '../redux/containers/app/components/GetStartedButton';
+import GetStartedButton from '../components/app/components/GetStartedButton';
+import PropTypes from 'prop-types';
 
 const image = { uri: "https://www.tidlor.com/tidlor/media/tidlor-image/webp/background/bg-graydiagonal.webp" };
 
-export default function LoadingScreen() {
+export default function LoadingScreen(props) {
+
+
       return (
             <ImageBackground source={image} resizeMode="cover" style={styles.bgCover}>
                   <View style={styles.container}>
-                        <GetStartedButton></GetStartedButton>
+                        <GetStartedButton onPress={props.onPress}></GetStartedButton>
                   </View>
             </ImageBackground>)
+}
+
+LoadingScreen.propTypes = {
+      onPress: PropTypes.func
 }
 
 const styles = StyleSheet.create({

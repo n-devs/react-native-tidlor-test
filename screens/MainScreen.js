@@ -3,136 +3,91 @@ import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import AddButton from '../components/app/components/AddButton';
 import CardUser from '../components/app/components/CardUser';
 import DeleteModal from '../components/app/components/DeleteModal';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { UPDATE_NAVIGATION_REQUESTED, GET_NAVIGATION_REQUESTED } from '../redux/constants/navigation';
+import { UPDATE_STATE_REQUESTED, DELETE_STATE_REQUESTED, GET_STATE_REQUESTED } from '../redux/constants/state';
+import { DELETE_USER_REQUESTED, GET_USERS_REQUESTED } from '../redux/constants/users';
 
-export default function MainScreen(props) {
-      const { navigationRedux,
-            dataStateRedux,
-            handleUpdateNavigation,
-            handleUpdateEditOnIdState,
-            handleUpdateEditOnState,
-            handleUpdateDBState } = props;
+function MainScreen(props) {
+      const {
+            navigation,
+            usersRedux,
+            getUsersRedux,
+            getStateRedux,
+            setNavigationRedux,
+            deleteUserRedux,
+            setStateRedux,
+            deleteStateRedux } = props;
 
-      const [locationScreen, setLocationScreen] = React.useState({
-            state: 1,
-            path: "register",
-            header: "สมัครสมาชิก"
-      });
       const [deleteDataState, setDeleteDataState] = React.useState(null);
       const [modalVisible, setModalVisible] = React.useState(false);
 
-
-      function update() {
-            let data;
-
-            data = {
-                  state: 2,
-                  path: "add-user",
-                  header: "เพิ่มสมาชิก"
-            }
-
-            let inputDataDefault = {
-                  firstName: "",
-                  lastName: "",
-                  IDNumber: "",
-                  phoneNumber: ""
-            }
-
-            setLocationScreen(data);
-
-            handleUpdateNavigation(data)
-            handleUpdateEditOnIdState(dataStateRedux.db.length)
-            handleUpdateEditOnState({
-                  id: dataStateRedux.db.length,
-                  ...inputDataDefault
-            })
-            props.navigation.push(data.path)
-
-      }
-
-      const onUpdate = (updateData) => (e) => {
-            let data;
-
-            data = {
-                  state: 3,
-                  path: "edit-user",
-                  header: "แก้ไขสมาชิก"
-            }
-            console.log("update id: ", updateData);
-
-            let inputDataDefault = {
-                  firstName: updateData.firstName,
-                  lastName: updateData.lastName,
-                  IDNumber: updateData.IDNumber,
-                  phoneNumber: updateData.phoneNumber
-            }
-
-            setLocationScreen(data);
-
-            handleUpdateNavigation(data)
-            handleUpdateEditOnIdState(updateData.id)
-            handleUpdateEditOnState({
-                  id: updateData.id,
-                  ...inputDataDefault
-            })
-            props.navigation.push(data.path)
-      }
-
-      const onDelete = (data) => (e) => {
-            console.log("delete id: ", data);
-
-            setDeleteDataState(data)
-            setModalVisible(!modalVisible)
-      }
-
-      const deleteData = (data) => (e) => {
-           
-            const dbDefault = dataStateRedux.db;
-
-            let removeData = dbDefault.filter(person => person.id !== data.id);
-
-           
-            setModalVisible(!modalVisible)
-            handleUpdateDBState(removeData)
-
-
-      }
-
-      function notDeleteData() {
-            setModalVisible(!modalVisible)
-      }
-
       React.useEffect(() => {
-            setLocationScreen(navigationRedux)
-      }, [navigationRedux])
-
+            getUsersRedux()
+            getStateRedux()
+      }, [])
       return (<View style={styles.container}>
             <ScrollView>
-                  {dataStateRedux.db.length > 0 ? dataStateRedux.db.map((val, i, arr) => (<View key={i}>
-
-                        <CardUser
+                  {usersRedux.users.length > 0 ? usersRedux.users.map((val, i, arr) => (<View key={i}>
+                        {val && (<CardUser
                               data={val}
                               name={`${val.firstName} ${val.lastName}`}
                               ID={`${val.IDNumber}`}
                               phone={`${val.phoneNumber}`}
-                              onPressEdit={onUpdate(val)}
-                              onPressDelete={onDelete(val)}
-                        ></CardUser>
+                              onPressEdit={() => {
+                                    setNavigationRedux({
+                                          state: 3,
+                                          path: "edit-user",
+                                          header: "แก้ไขสมาชิก"
+                                    });
+                                    setStateRedux(val);
+                                    navigation.push("edit-user")
+
+                              }}
+                              onPressDelete={() => {
+                                    setDeleteDataState(val)
+                                    setModalVisible(!modalVisible)
+                              }}
+                        ></CardUser>)}
+
                   </View>)) : (<Text style={styles.text}>คุณยังไม่มีสมาชิก กรุณาเพิ่มสมาชิก</Text>)}
 
-                  <AddButton onPress={update}></AddButton>
+                  <AddButton onPress={() => {
+                        deleteStateRedux({
+                              id: usersRedux.users.length,
+                              firstName: "",
+                              lastName: "",
+                              IDNumber: "",
+                              phoneNumber: ""
+                        })
+                        setNavigationRedux({
+                              state: 2,
+                              path: "add-user",
+                              header: "เพิ่มสมาชิก"
+                        });
+                        navigation.push("add-user")
+
+
+                  }}></AddButton>
             </ScrollView>
             <DeleteModal
                   data={deleteDataState}
                   open={modalVisible}
-                  onDelete={deleteData(deleteDataState)}
-                  onNotDelete={notDeleteData}></DeleteModal>
+                  onDelete={() => {
+                        let removeData = usersRedux.users.filter(user => user.id !== deleteDataState.id);
+
+
+                        setModalVisible(!modalVisible)
+                        deleteUserRedux(deleteDataState.id)
+                  }}
+                  onNotDelete={() => { setModalVisible(!modalVisible) }}></DeleteModal>
       </View>)
 }
 
 const styles = StyleSheet.create({
       container: {
-            flex: 1,
-            // justifyContent: "center",
+            flex: 1
       },
       text: {
             marginTop: 50,
@@ -142,3 +97,34 @@ const styles = StyleSheet.create({
       }
 
 });
+
+MainScreen.propTypes = {
+      navigation: PropTypes.object,
+      usersRedux: PropTypes.object,
+      getUsersRedux: PropTypes.func.isRequired,
+      setNavigationRedux: PropTypes.func.isRequired,
+      deleteUserRedux: PropTypes.func.isRequired,
+      setStateRedux: PropTypes.func.isRequired,
+      deleteStateRedux: PropTypes.func.isRequired,
+      getStateRedux: PropTypes.func.isRequired,
+}
+
+
+// Get state to props
+const mapStateToProps = (state) => ({
+      usersRedux: state.usersRedux
+})
+
+// Get dispatch / function to props
+const mapDispatchToProps = (dispatch) => ({
+      getUsersRedux: () => dispatch({ type: GET_USERS_REQUESTED }),
+      getStateRedux: () => dispatch({ type: GET_STATE_REQUESTED }),
+      getNavigationRedux: () => dispatch({ type: GET_NAVIGATION_REQUESTED }),
+      setNavigationRedux: (navigation) => dispatch({ type: UPDATE_NAVIGATION_REQUESTED, payload: navigation }),
+      deleteUserRedux: (user) => dispatch({ type: DELETE_USER_REQUESTED, payload: user }),
+      setStateRedux: (state) => dispatch({ type: UPDATE_STATE_REQUESTED, payload: state }),
+      deleteStateRedux: (state) => dispatch({ type: DELETE_STATE_REQUESTED, payload: state }),
+})
+
+// To make those two function works register it using connect
+export default connect(mapStateToProps, mapDispatchToProps)(MainScreen)

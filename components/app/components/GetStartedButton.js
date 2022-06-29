@@ -1,44 +1,29 @@
 import React from 'react';
-import { StyleSheet,Text, Pressable } from 'react-native';
+import { StyleSheet, Text, Pressable } from 'react-native';
+import PropTypes from 'prop-types';
 
- function Button(props) {
-      const { onPress, title = 'Save' } = props;
+function Button(props) {
+      const { onPress, title } = props;
       return (
-        <Pressable  style={styles.button} onPress={onPress}>
-          <Text style={styles.text}>{title}</Text>
-        </Pressable>
+            <Pressable style={styles.button} onPress={onPress}>
+                  <Text style={styles.text}>{title}</Text>
+            </Pressable>
       );
-    }
+}
+
+Button.propTypes = {
+      onPress: PropTypes.func,
+      title: PropTypes.string
+}
 
 export default function GetStartedButton(props) {
-      const { navigationRedux, handleUpdateNavigation } = props;
-      const [value, setValue] = React.useState({
-            state: 0,
-            path: "loadding",
-            header: "loadding"
-      });
-
-      const update = (newValue) => (e) => {
-            let data;
-
-            data = {
-                  state: newValue,
-                  path: "register",
-                  header: "สมัครสมาชิก"
-            }
-            setValue(data);
-            handleUpdateNavigation(data)
-      }
-
-      React.useEffect(() => {
-            setValue(navigationRedux)
-      }, [navigationRedux])
 
       return (<Button
-           
+
             title="Get Started"
             color="#0060ab"
-            onPress={ update(1)}
+            onPress={props.onPress}
+
       />)
 }
 
@@ -56,12 +41,16 @@ const styles = StyleSheet.create({
             backgroundColor: '#0060ab',
             border: 0,
             margin: 50
-          },
-          text: {
+      },
+      text: {
             fontSize: 16,
             lineHeight: 21,
             fontWeight: 'bold',
             letterSpacing: 0.25,
             color: 'white',
-          },
+      },
 });
+
+GetStartedButton.propTypes = {
+      onPress: PropTypes.func
+}

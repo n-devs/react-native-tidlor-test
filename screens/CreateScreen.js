@@ -5,132 +5,155 @@ import TextInputFirstName from '../components/app/components/TextInputFirstName'
 import TextInputIDNumber from '../components/app/components/TextInputIDNumber';
 import TextInputLastName from '../components/app/components/TextInputLastName';
 import TextInputPhoneNumber from '../components/app/components/TextInputPhoneNumber';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { UPDATE_NAVIGATION_REQUESTED, GET_NAVIGATION_REQUESTED } from '../redux/constants/navigation';
+import { UPDATE_USER_REQUESTED, GET_USERS_REQUESTED, CREATE_USER_REQUESTED } from '../redux/constants/users';
+import { DELETE_STATE_REQUESTED, GET_STATE_REQUESTED } from '../redux/constants/state';
+import { useForm, Controller } from "react-hook-form";
 
-export default function CreateScreen(props) {
 
-      const { navigationRedux,
-            dataStateRedux,
-            handleUpdateNavigation,
-            handleUpdateDBState,
-            handleUpdateEditOnIdState,
-            handleUpdateEditOnState } = props;
-      const [locationScreen, setLocationScreen] = React.useState({
-            state: 1,
-            path: "register",
-            header: "สมัครสมาชิก"
-      });
+function CreateScreen(props) {
+
+      const {
+            navigation,
+            navigationRedux,
+            usersRedux,
+            stateRedux,
+            getStateRedux,
+            getUsersRedux,
+            getNavigationRedux,
+            setNavigationRedux,
+            addUserRedux,
+            setUserRedux
+      } = props;
       const [id, setId] = React.useState(0)
-      const [firstName, setFirstName] = React.useState("")
-      const [lastName, setLastName] = React.useState("")
-      const [IDNumber, setIDNumber] = React.useState("")
-      const [phoneNumber, setPhoneNumber] = React.useState("")
+
+      const { register, setValue, getValues, handleSubmit, control, reset, formState: { errors } } = useForm();
 
       const re_id = /^(?:\d{1}|\(\d{1}\))([-\/\.])\d{4}\1\d{5}\1\d{2}\1\d{1}$/;
       const re_phone = /^(?:\d{3}|\(\d{3}\))([-\/\.])\d{3}\1\d{4}$/;
 
-      function createData() {
-            let inputDataDefault = {
-                  firstName: "",
-                  lastName: "",
-                  IDNumber: "",
-                  phoneNumber: ""
-            }
+      function addData(data) {
 
-            let dbDefault = dataStateRedux.db;
-            dbDefault.push({
-                  id: dbDefault.length,
-                  firstName: firstName,
-                  lastName: lastName,
-                  IDNumber: IDNumber,
-                  phoneNumber: phoneNumber
+            usersRedux.users.push({
+                  id: usersRedux.users.length,
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  IDNumber: data.IDNumber,
+                  phoneNumber: data.phoneNumber
             })
 
-
-            console.log("create", dbDefault);
-
-            handleUpdateDBState(dbDefault)
-            handleUpdateEditOnState({
-                  id: dbDefault.length,
-                  ...inputDataDefault
-            })
-            handleUpdateEditOnIdState(dbDefault.length)
-
-      }
-
-      function updateData() {
-            console.log("aa");
-            let inputDataDefault = {
-                  firstName: "",
-                  lastName: "",
-                  IDNumber: "",
-                  phoneNumber: ""
-            }
-
-            const dbDefault = dataStateRedux.db;
-
-            let updateDB = dbDefault.findIndex((obj => obj.id === id));
-
-            dbDefault[updateDB].id = id;
-            dbDefault[updateDB].firstName = firstName;
-            dbDefault[updateDB].lastName = lastName;
-            dbDefault[updateDB].IDNumber = IDNumber;
-            dbDefault[updateDB].phoneNumber = phoneNumber;
-
-            console.log("update", updateDB);
-
-            handleUpdateDBState(dbDefault)
-            handleUpdateEditOnState({
-                  id: dbDefault.length,
-                  ...inputDataDefault
-            })
-            handleUpdateEditOnIdState(dbDefault.length)
+            addUserRedux(usersRedux.users)
 
 
 
       }
 
-      function update() {
+      function updateData(data) {
 
-            let data = {
-                  state: 1,
-                  path: "register",
-                  header: "สมัครสมาชิก"
-            }
-            setLocationScreen(data);
-            handleUpdateNavigation(data)
+            let updateUser = usersRedux.users.findIndex((user => user.id === id));
 
-            if (navigationRedux.state === 2) {
-                  createData()
-
-            } else if (navigationRedux.state === 3) {
-                  updateData()
-            }
-
-
-            props.navigation.push(data.path)
+            usersRedux.users[updateUser].id = id;
+            usersRedux.users[updateUser].firstName = data.firstName;
+            usersRedux.users[updateUser].lastName = data.lastName;
+            usersRedux.users[updateUser].IDNumber = data.IDNumber;
+            usersRedux.users[updateUser].phoneNumber =data. phoneNumber;
+            setUserRedux(usersRedux.users)
       }
+
+      const onSubmit = data => {
+            console.log(data);
+            if (data.firstName && data.lastName && data.IDNumber && re_id.exec(data.IDNumber) && data.phoneNumber && re_phone.exec(data.phoneNumber)) {
+                  let nav = {
+                        state: 1,
+                        path: "register",
+                        header: "สมัครสมาชิก"
+                  }
+                  setNavigationRedux(nav)
+      
+                  if (navigationRedux.state === 2) {
+                        addData(data)
+      
+                  } else if (navigationRedux.state === 3) {
+                        updateData(data)
+                  }
+      
+      
+                  navigation.push(nav.path)
+            }
+      };
 
       React.useEffect(() => {
-            setLocationScreen(navigationRedux)
+            getNavigationRedux()
+            getUsersRedux()
+            getStateRedux()
 
-            setId(dataStateRedux.editOn.id)
-            setFirstName(dataStateRedux.editOn.firstName)
-            setLastName(dataStateRedux.editOn.lastName)
-            setIDNumber(dataStateRedux.editOn.IDNumber)
-            setPhoneNumber(dataStateRedux.editOn.phoneNumber)
-    
-      }, [navigationRedux, dataStateRedux])
+            setId(stateRedux.id)
+
+            setValue('firstName', stateRedux.firstName);
+            setValue('lastName', stateRedux.lastName);
+            setValue('IDNumber', stateRedux.IDNumber);
+            setValue('phoneNumber', stateRedux.phoneNumber);
+      }, [])
 
 
 
       return (<View style={styles.container}>
-            <TextInputFirstName value={firstName} onChangeText={setFirstName}></TextInputFirstName>
-            <TextInputLastName value={lastName} onChangeText={setLastName}></TextInputLastName>
-            <TextInputIDNumber value={IDNumber} onChangeText={setIDNumber}></TextInputIDNumber>
-            <TextInputPhoneNumber value={phoneNumber} onChangeText={setPhoneNumber}></TextInputPhoneNumber>
-            {firstName && lastName && IDNumber && re_id.exec(IDNumber) && phoneNumber && re_phone.exec(phoneNumber) ? (
-                  <ButtonConfirm onPress={update} disabled={false}></ButtonConfirm>
-            ) : (<ButtonConfirm onPress={update} disabled={true}></ButtonConfirm>)}
+
+            <Controller
+                  control={control}
+                  // rules={{
+                  //       required: true,
+                  // }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInputFirstName
+
+                              onBlur={onBlur}
+                              onChangeText={value => onChange(value)}
+                              value={value}
+                        ></TextInputFirstName>
+                  )}
+                  name="firstName"
+            />
+
+            <Controller
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInputLastName
+                              onBlur={onBlur}
+                              onChangeText={value => onChange(value)}
+                              value={value}
+                        />
+                  )}
+                  name="lastName"
+            />
+
+            <Controller
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInputIDNumber
+                              onBlur={onBlur}
+                              onChangeText={value => onChange(value)}
+                              value={value}
+                        />
+                  )}
+                  name="IDNumber"
+            />
+
+            <Controller
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInputPhoneNumber
+                              onBlur={onBlur}
+                              onChangeText={value => onChange(value)}
+                              value={value}
+                        />
+                  )}
+                  name="phoneNumber"
+            />
+
+            <ButtonConfirm title="Submit" onPress={handleSubmit(onSubmit)} disabled={false}></ButtonConfirm>
 
       </View>)
 }
@@ -146,3 +169,38 @@ const styles = StyleSheet.create({
             padding: 10,
       }
 });
+
+CreateScreen.propTypes = {
+      navigation: PropTypes.object,
+      navigationRedux: PropTypes.object,
+      usersRedux: PropTypes.object,
+      stateRedux: PropTypes.object,
+      getStateRedux: PropTypes.func.isRequired,
+      getUsersRedux: PropTypes.func.isRequired,
+      getNavigationRedux: PropTypes.func.isRequired,
+      setNavigationRedux: PropTypes.func.isRequired,
+      addUserRedux: PropTypes.func.isRequired,
+      setUserRedux: PropTypes.func.isRequired,
+}
+
+
+// Get state to props
+const mapStateToProps = (state) => ({
+      usersRedux: state.usersRedux,
+      stateRedux: state.stateRedux,
+      navigationRedux: state.navigationRedux,
+
+})
+
+// Get dispatch / function to props
+const mapDispatchToProps = (dispatch) => ({
+      getStateRedux: () => dispatch({ type: GET_STATE_REQUESTED }),
+      getUsersRedux: () => dispatch({ type: GET_USERS_REQUESTED }),
+      getNavigationRedux: () => dispatch({ type: GET_NAVIGATION_REQUESTED }),
+      setNavigationRedux: (navigation) => dispatch({ type: UPDATE_NAVIGATION_REQUESTED, payload: navigation }),
+      addUserRedux: (user) => dispatch({ type: CREATE_USER_REQUESTED, payload: user }),
+      setUserRedux: (user) => dispatch({ type: UPDATE_USER_REQUESTED, payload: user }),
+})
+
+// To make those two function works register it using connect
+export default connect(mapStateToProps, mapDispatchToProps)(CreateScreen)
